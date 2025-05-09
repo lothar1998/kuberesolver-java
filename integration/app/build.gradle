@@ -34,7 +34,9 @@ dependencies {
     implementation 'io.grpc:grpc-protobuf:1.72.0'
     implementation 'io.grpc:grpc-stub:1.72.0'
     implementation 'io.grpc:grpc-netty-shaded:1.72.0'
- 
+    implementation 'io.projectreactor.netty:reactor-netty-http:1.2.5'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.18.3'
+
     protobuf files("proto/")
 }
 
