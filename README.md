@@ -1,2 +1,2 @@
-# kuberesolver
+# kuberesolver-java
 Kuberesolver for Java
