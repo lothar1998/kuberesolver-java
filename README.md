@@ -2,7 +2,7 @@
 A gRPC name resolver that uses a Kubernetes API to discover backend servers via `Service` name. This library uses
 only the JSON parsing library as the dependency to do not blow your dependency tree.
 
-## Usage
+### Usage
 ```java
 import io.github.lothar1998.kuberesolver.KubernetesNameResolverProvider;
 import io.grpc.ManagedChannelBuilder;
@@ -21,6 +21,7 @@ public class App {
 }
 ```
 
+### Supported targets
 This library supports all targets from the below list:
 ```
 kubernetes:///service-name:8080
@@ -36,15 +37,15 @@ kubernetes://service-name.namespace.svc.cluster_name
 kubernetes://service-name.namespace.svc.cluster_name:8080
 ```
 
-## Alternative scheme 
-You can use alternative schema (other than `kubernetes`) by using overloaded constructor
-`new KubernetesNameResolverProvider("my-custom-scheme")`.
+### Alternative scheme 
+You can use alternative schema (other than `kubernetes`) by using overloaded constructor:
+```new KubernetesNameResolverProvider("my-custom-scheme")```.
 
-## RBAC
+### RBAC
 If you are using RBAC in you Kubernetes cluster, you have to give `WATCH` access to `endpointslices` resource 
  to allow the resolver to discover the backend servers.
 
-## Acknowledgements
+### Acknowledgements
 
 This project is inspired by https://github.com/sercand/kuberesolver.
 Special thanks to the authors for their foundational work and design ideas.
