@@ -1,0 +1,108 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: server
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: server
+  template:
+    metadata:
+      labels:
+        app: server
+    spec:
+      containers:
+        - name: server
+          image: server:latest
+          imagePullPolicy: Never
+          env:
+            - name: IP_ADDR
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+          ports:
+            - containerPort: 50051
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: client
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: client
+  template:
+    metadata:
+      labels:
+        app: client
+    spec:
+      containers:
+        - name: client
+          image: client:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 50052
+      serviceAccountName: client
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: server
+  namespace: default
+  labels:
+    app: server
+spec:
+  clusterIP: None
+  selector:
+    app: server
+  ports:
+    - port: 50051
+      targetPort: 50051
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: client
+  namespace: default
+  labels:
+    app: client
+spec:
+  selector:
+    app: client
+  ports:
+    - port: 50052
+      targetPort: 50052
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: client
+  namespace: default
+rules:
+  - apiGroups: ["discovery.k8s.io"]
+    resources: ["endpointslices"]
+    verbs: ["get", "watch"]
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: client
+  namespace: default
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: client
+  namespace: default
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: client
+subjects:
+  - kind: ServiceAccount
+    name: client
+    namespace: default
