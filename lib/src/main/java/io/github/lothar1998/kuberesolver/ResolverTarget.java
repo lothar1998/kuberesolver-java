@@ -4,10 +4,35 @@ import java.net.URI;
 import javax.annotation.Nullable;
 import javax.annotation.Nonnull;
 
+/**
+ * Represents a parsed Kubernetes target including service name, namespace, and optional port.
+ * Used by {@link KubernetesNameResolver} to extract target information from a URI.
+ */
 public record ResolverTarget(@Nullable String namespace,
                              @Nonnull String service,
                              @Nullable String port) {
 
+    /**
+     * Parses a {@link URI} into a {@link ResolverTarget}, extracting the service, namespace, and port.
+     * Supports formats like:
+     * <ul>
+     *   <li>kubernetes:///service-name:8080</li>
+     *   <li>kubernetes:///service-name:portname</li>
+     *   <li>kubernetes:///service-name.namespace:8080</li>
+     *   <li>kubernetes:///service-name.namespace.svc.cluster_name</li>
+     *   <li>kubernetes:///service-name.namespace.svc.cluster_name:8080</li>
+     *
+     *   <li>kubernetes://namespace/service-name:8080</li>
+     *   <li>kubernetes://service-name:8080/</li>
+     *   <li>kubernetes://service-name.namespace:8080/</li>
+     *   <li>kubernetes://service-name.namespace.svc.cluster_name</li>
+     *   <li>kubernetes://service-name.namespace.svc.cluster_name:8080</li>
+     * </ul>
+     *
+     * @param uri the URI to parse
+     * @return the parsed {@link ResolverTarget}
+     * @throws IllegalArgumentException if the service name cannot be determined
+     */
     public static ResolverTarget parse(URI uri) throws IllegalArgumentException {
         ResolverTarget params;
         if (uri.getAuthority() == null || uri.getAuthority().isEmpty()) {

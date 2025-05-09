@@ -25,6 +25,14 @@ import io.grpc.EquivalentAddressGroup;
 import io.grpc.NameResolver;
 import io.grpc.Status;
 
+/**
+ * A gRPC {@link NameResolver} implementation that resolves Kubernetes services
+ * using EndpointSlices.
+ * <p>
+ * This resolver watches for changes in Kubernetes EndpointSlices and updates
+ * the gRPC client with the resolved addresses.
+ * </p>
+ */
 public final class KubernetesNameResolver extends NameResolver {
 
     private static final Logger LOGGER = Logger.getLogger(KubernetesNameResolver.class.getName());
@@ -41,13 +49,26 @@ public final class KubernetesNameResolver extends NameResolver {
     private boolean defaultExecutorUsed = false;
     private Listener listener;
 
+    /**
+     * Creates a new {@link KubernetesNameResolver} with a default single-threaded
+     * executor.
+     *
+     * @param params the target parameters for the resolver
+     * @throws IOException if an error occurs while initializing the watcher
+     */
     public KubernetesNameResolver(ResolverTarget params) throws IOException {
         this(Executors.newSingleThreadExecutor(), params);
         this.defaultExecutorUsed = true;
     }
 
-    public KubernetesNameResolver(Executor executor, ResolverTarget params)
-            throws IOException {
+    /**
+     * Creates a new {@link KubernetesNameResolver} with a custom executor.
+     *
+     * @param executor the executor to use for background tasks
+     * @param params   the target parameters for the resolver
+     * @throws IOException if an error occurs while initializing the watcher
+     */
+    public KubernetesNameResolver(Executor executor, ResolverTarget params) throws IOException {
         this.executor = executor;
         this.params = params;
         if (params.namespace() != null) {
@@ -57,12 +78,22 @@ public final class KubernetesNameResolver extends NameResolver {
         }
     }
 
+    /**
+     * Starts the name resolution process.
+     *
+     * @param listener the listener to notify when addresses are resolved or errors
+     *                 occur
+     */
     @Override
     public void start(Listener listener) {
         this.listener = listener;
         resolve();
     }
 
+    /**
+     * Refreshes the name resolution process. This method is called when the gRPC
+     * client requests a refresh.
+     */
     @Override
     public void refresh() {
         if (semaphore.tryAcquire()) {
@@ -70,10 +101,17 @@ public final class KubernetesNameResolver extends NameResolver {
         }
     }
 
+    /**
+     * Resolves the Kubernetes service by watching EndpointSlices.
+     */
     private void resolve() {
         executor.execute(this::watch);
     }
 
+    /**
+     * Watches for changes in EndpointSlices and updates the listener with resolved
+     * addresses.
+     */
     private void watch() {
         watcher.watch(params.service(), new EndpointSliceWatcher.Subscriber() {
             @Override
@@ -81,13 +119,13 @@ public final class KubernetesNameResolver extends NameResolver {
                 // watch event occurred
                 if (!SUPPORTED_KUBERNETES_EVENTS.contains(event.type())) {
                     LOGGER.log(Level.FINER, "Unsupported Kubernetes event type {0}",
-                            new Object[] { event.type().toString() });
+                            new Object[]{event.type().toString()});
                     return;
                 }
 
                 if (event.type().equals(EventType.DELETED)) {
                     LOGGER.log(Level.FINE, "EndpointSlice {0} was deleted",
-                            new Object[] { event.endpointSlice().metadata().name() });
+                            new Object[]{event.endpointSlice().metadata().name()});
                     return;
                 }
 
@@ -96,10 +134,10 @@ public final class KubernetesNameResolver extends NameResolver {
                     return;
                 }
 
-                LOGGER.log(Level.FINER, "Resolving addresses for service {0}", new Object[] { params.service() });
+                LOGGER.log(Level.FINER, "Resolving addresses for service {0}", new Object[]{params.service()});
                 buildAddresses(event.endpointSlice()).ifPresentOrElse(a -> listener.onAddresses(a, Attributes.EMPTY),
                         () -> LOGGER.log(Level.FINE, "No usable addresses found for Kubernetes service {0}",
-                                new Object[] { params.service() }));
+                                new Object[]{params.service()}));
             }
 
             @Override
@@ -120,6 +158,9 @@ public final class KubernetesNameResolver extends NameResolver {
         });
     }
 
+    /**
+     * Shuts down the resolver and releases resources.
+     */
     @Override
     public void shutdown() {
         if (defaultExecutorUsed && executor instanceof ExecutorService executor) {
@@ -127,11 +168,23 @@ public final class KubernetesNameResolver extends NameResolver {
         }
     }
 
+    /**
+     * Returns the authority of the service being resolved.
+     *
+     * @return an empty string as this resolver does not use service authority
+     */
     @Override
     public String getServiceAuthority() {
         return "";
     }
 
+    /**
+     * Builds a list of gRPC {@link EquivalentAddressGroup} from the given
+     * {@link EndpointSlice}.
+     *
+     * @param endpointSlice the EndpointSlice to process
+     * @return an optional list of resolved addresses
+     */
     private Optional<List<EquivalentAddressGroup>> buildAddresses(EndpointSlice endpointSlice) {
         return findPort(endpointSlice.ports())
                 .map(port -> endpointSlice.endpoints().stream()
@@ -140,6 +193,13 @@ public final class KubernetesNameResolver extends NameResolver {
                         .toList());
     }
 
+    /**
+     * Finds the port to use for the service from the list of ports in the
+     * EndpointSlice.
+     *
+     * @param ports the list of ports in the EndpointSlice
+     * @return an optional port number
+     */
     private Optional<Integer> findPort(List<EndpointPort> ports) {
         if (params.port() == null) {
             return ports.stream().map(EndpointPort::port).findFirst();
@@ -155,6 +215,14 @@ public final class KubernetesNameResolver extends NameResolver {
         }
     }
 
+    /**
+     * Builds a gRPC {@link EquivalentAddressGroup} from the given addresses and
+     * port.
+     *
+     * @param addresses the list of addresses
+     * @param port      the port number
+     * @return an {@link EquivalentAddressGroup} containing the resolved addresses
+     */
     private EquivalentAddressGroup buildAddressGroup(List<String> addresses, int port) {
         var socketAddresses = addresses.stream()
                 .map(address -> (SocketAddress) new InetSocketAddress(address, port))
