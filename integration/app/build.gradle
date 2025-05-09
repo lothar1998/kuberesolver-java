@@ -67,3 +67,26 @@ protobuf {
 shadowJar {
     mergeServiceFiles()
 }
+
+def dockerfilePath = file("Dockerfile").absolutePath
+def dockerContext = rootProject.projectDir.absolutePath
+
+tasks.register('buildClientDockerImage', Exec) {
+    group = 'docker'
+    description = 'Builds Docker image for client target in integration app'
+    workingDir = dockerContext
+    commandLine 'sh', '-c', "docker build -f ${dockerfilePath} -t client --target client ${dockerContext}"
+}
+
+tasks.register('buildServerDockerImage', Exec) {
+    group = 'docker'
+    description = 'Builds Docker image for server target in integration app'
+    workingDir = dockerContext
+    commandLine 'sh', '-c', "docker build -f ${dockerfilePath} -t server --target server ${dockerContext}"
+}
+
+tasks.register('buildDockerImages') {
+    group = 'docker'
+    description = 'Builds both client and server Docker images'
+    dependsOn 'buildClientDockerImage', 'buildServerDockerImage'
+}
