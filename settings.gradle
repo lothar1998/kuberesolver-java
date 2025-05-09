@@ -11,6 +11,6 @@ plugins {
 }
 
 rootProject.name = 'kuberesolver'
-include(':lib', ':app')
+include(':lib', ':app', ':test')
 project(':app').projectDir = file('integration/app')
-
+project(':test').projectDir = file('integration/test')
