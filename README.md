@@ -41,7 +41,7 @@ You can use alternative schema (other than `kubernetes`) by using overloaded con
 `new KubernetesNameResolverProvider("my-custom-scheme")`.
 
 ## RBAC
-If you are using RBAC in you Kubernetes cluster, you have to give `GET` and `WATCH` access to `endpointslices` resource 
+If you are using RBAC in you Kubernetes cluster, you have to give `WATCH` access to `endpointslices` resource 
  to allow the resolver to discover the backend servers.
 
 ## Acknowledgements
