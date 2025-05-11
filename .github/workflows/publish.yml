@@ -27,4 +27,8 @@ jobs:
         run: ./gradlew :lib:publish
         env:
           RELEASE_VERSION: ${{ github.ref_name }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Required for GitHub Packages
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # For GitHub Packages
+          CENTRAL_USERNAME: ${{ secrets.CENTRAL_USERNAME }} # For Central Portal
+          CENTRAL_TOKEN: ${{ secrets.CENTRAL_TOKEN }}       # For Central Portal
+          SIGNING_SECRET_KEYRING_FILE_B64: ${{ secrets.SIGNING_SECRET_KEYRING_FILE_B64 }} # For Central Portal signing
+          SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}         
