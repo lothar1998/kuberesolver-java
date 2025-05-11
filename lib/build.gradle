@@ -1,6 +1,7 @@
 plugins {
     id 'java-library'
     id 'maven-publish'
+    id 'org.jreleaser' version '1.18.0'
 }
 
 repositories {
@@ -42,11 +43,33 @@ publishing {
             pom {
                 name = 'Kuberesolver'
                 description = 'gRPC name resolver for Kubernetes'
+                url = 'https://github.com/lothar1998/kuberesolver-java'
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'https://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'lothar1998'
+                        name = 'Piotr Kuglin'
+                        email = 'lothar1998.dev@gmail.com'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:git://github.com/lothar1998/kuberesolver-java.git'
+                    developerConnection = 'scm:git:ssh://git@github.com:lothar1998/kuberesolver-java.git'
+                    url = 'https://github.com/lothar1998/kuberesolver-java'
+                }
             }
         }
     }
 
     repositories {
+        maven {
+            url = layout.buildDirectory.dir('staging-deploy')
+        }
         maven {
             name = "GitHubPackages"
             url = uri("https://maven.pkg.github.com/lothar1998/kuberesolver-java")
@@ -56,4 +79,25 @@ publishing {
             }
         }
     }
+}
+
+jreleaser {
+  project {
+    version = System.getenv("RELEASE_VERSION") ?: "0.0.1-SNAPSHOT"
+  }
+  signing {
+    active = 'ALWAYS'
+    armored = true
+  }
+  deploy {
+    maven {
+      mavenCentral {
+        sonatype {
+          active = 'ALWAYS'
+          url = 'https://central.sonatype.com/api/v1/publisher'
+          stagingRepository('build/staging-deploy')
+        }
+      }
+    }
+  }
 }

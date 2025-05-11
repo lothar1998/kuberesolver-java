@@ -24,7 +24,17 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Publish Artifact
-        run: ./gradlew :lib:publish
+        run: |
+          ./gradlew jreleaserConfig --git-root-search
+          ./gradlew clean
+          ./gradlew :lib:publish
+          ./gradlew :lib:jreleaserFullRelease --git-root-search
         env:
           RELEASE_VERSION: ${{ github.ref_name }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Required for GitHub Packages
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # For GitHub Packages
+          JRELEASER_MAVENCENTRAL_USERNAME: ${{ secrets.JRELEASER_MAVENCENTRAL_USERNAME }}
+          JRELEASER_MAVENCENTRAL_PASSWORD: ${{ secrets.JRELEASER_MAVENCENTRAL_PASSWORD }}
+          JRELEASER_GPG_SECRET_KEY: ${{ secrets.JRELEASER_GPG_SECRET_KEY }}
+          JRELEASER_GPG_PUBLIC_KEY: ${{ secrets.JRELEASER_GPG_PUBLIC_KEY }}
+          JRELEASER_GPG_PASSPHRASE: ${{ secrets.JRELEASER_GPG_PASSPHRASE  }}      
+          JRELEASER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
