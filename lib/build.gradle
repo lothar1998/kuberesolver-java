@@ -1,6 +1,7 @@
 plugins {
     id 'java-library'
     id 'maven-publish'
+    id 'signing'
 }
 
 repositories {
@@ -42,11 +43,38 @@ publishing {
             pom {
                 name = 'Kuberesolver'
                 description = 'gRPC name resolver for Kubernetes'
+                url = 'https://github.com/lothar1998/kuberesolver-java'
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'https://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'lothar1998'
+                        name = 'Piotr Kuglin'
+                        email = 'lothar1998.dev@gmail.com'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:git://github.com/lothar1998/kuberesolver-java.git'
+                    developerConnection = 'scm:git:ssh://git@github.com:lothar1998/kuberesolver-java.git'
+                    url = 'https://github.com/lothar1998/kuberesolver-java'
+                }
             }
         }
     }
 
     repositories {
+        maven {
+            name = "CentralPortal"
+            url = uri("https://central.sonatype.com/api/v1/publisher/upload")
+            credentials {
+                username = project.findProperty("central.user") ?: System.getenv("CENTRAL_USERNAME")
+                password = project.findProperty("central.key") ?: System.getenv("CENTRAL_TOKEN")
+            }
+        }
         maven {
             name = "GitHubPackages"
             url = uri("https://maven.pkg.github.com/lothar1998/kuberesolver-java")
@@ -55,5 +83,17 @@ publishing {
                 password = project.findProperty("gpr.key") ?: System.getenv("GITHUB_TOKEN")
             }
         }
+    }
+}
+
+signing {
+    sign publishing.publications.maven
+    def privateKeyBase64 = System.getenv("SIGNING_SECRET_KEYRING_FILE_B64")
+    def signingPassword = System.getenv("SIGNING_PASSWORD")
+
+    if (privateKeyBase64 != null && signingPassword != null) {
+        useInMemoryPgpKeys(Base64.getDecoder().decode(privateKeyBase64), signingPassword)
+    } else {
+        println "Warning: GPG signing environment variables not found. Skipping signing."
     }
 }
