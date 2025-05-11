@@ -24,6 +24,7 @@ public class App {
 ### Supported targets
 This library supports all targets from the below list:
 ```
+kubernetes:///service-name
 kubernetes:///service-name:8080
 kubernetes:///service-name:portname
 kubernetes:///service-name.namespace:8080
@@ -31,11 +32,18 @@ kubernetes:///service-name.namespace.svc.cluster_name
 kubernetes:///service-name.namespace.svc.cluster_name:8080
 
 kubernetes://namespace/service-name:8080
+kubernetes://service-name
 kubernetes://service-name:8080/
 kubernetes://service-name.namespace:8080/
 kubernetes://service-name.namespace.svc.cluster_name
 kubernetes://service-name.namespace.svc.cluster_name:8080
 ```
+
+#### Namespace handling
+If the namespace is not explicitly provided in the target URI, the resolver will first attempt to read the current pod's namespace from the mounted file at `/var/run/secrets/kubernetes.io/serviceaccount/namespace`. If this file is not found or cannot be read, it will default to using the `default` namespace.
+
+#### Port handling
+If the port is not specified in the URI, the resolver will use the first port defined in the Kubernetes `EndpointSlice`. Alternatively, a port can be specified by its name in the URI (e.g., `kubernetes:///myservice:grpc`), in which case the resolver will look for an `EndpointSlice` port with that name. If a numerical port is provided, that port will be used.
 
 ### Alternative scheme 
 You can use alternative schema (other than `kubernetes`) by using overloaded constructor:
