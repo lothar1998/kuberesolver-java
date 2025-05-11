@@ -91,7 +91,7 @@ signing {
     def privateKey = System.getenv("SIGNING_KEY_FILE")
     def signingPassword = System.getenv("SIGNING_PASSWORD")
 
-    if (privateKeyBase64 != null && signingPassword != null) {
+    if (privateKey != null && signingPassword != null) {
         useInMemoryPgpKeys(privateKey, signingPassword)
     } else {
         println "Warning: GPG signing environment variables not found. Skipping signing."
