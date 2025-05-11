@@ -6,6 +6,7 @@ import javax.annotation.Nonnull;
 
 /**
  * Represents a parsed Kubernetes target including service name, namespace, and optional port.
+ * Service name is always required but namespace and port are optional.
  * Used by {@link KubernetesNameResolver} to extract target information from a URI.
  */
 public record ResolverTarget(@Nullable String namespace,
@@ -16,6 +17,7 @@ public record ResolverTarget(@Nullable String namespace,
      * Parses a {@link URI} into a {@link ResolverTarget}, extracting the service, namespace, and port.
      * Supports formats like:
      * <ul>
+     *   <li>kubernetes:///service-name</li>
      *   <li>kubernetes:///service-name:8080</li>
      *   <li>kubernetes:///service-name:portname</li>
      *   <li>kubernetes:///service-name.namespace:8080</li>
@@ -23,6 +25,7 @@ public record ResolverTarget(@Nullable String namespace,
      *   <li>kubernetes:///service-name.namespace.svc.cluster_name:8080</li>
      *
      *   <li>kubernetes://namespace/service-name:8080</li>
+     *   <li>kubernetes://service-name</li>
      *   <li>kubernetes://service-name:8080/</li>
      *   <li>kubernetes://service-name.namespace:8080/</li>
      *   <li>kubernetes://service-name.namespace.svc.cluster_name</li>

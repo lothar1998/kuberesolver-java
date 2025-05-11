@@ -35,6 +35,8 @@ public class ResolverTargetTest {
                 return Stream.of(
                                 Arguments.of("kubernetes:///service-name:8080",
                                                 new ResolverTarget(null, "service-name", "8080")),
+                                Arguments.of("kubernetes:///service-name",
+                                                new ResolverTarget(null, "service-name", null)),
                                 Arguments.of("kubernetes:///service-name:portname",
                                                 new ResolverTarget(null, "service-name", "portname")),
                                 Arguments.of("kubernetes:///service-name.namespace:8080",
@@ -45,6 +47,8 @@ public class ResolverTargetTest {
                                                 new ResolverTarget("namespace", "service-name", "8080")),
                                 Arguments.of("kubernetes://namespace/service-name:8080",
                                                 new ResolverTarget("namespace", "service-name", "8080")),
+                                Arguments.of("kubernetes://service-name",
+                                                new ResolverTarget(null, "service-name", null)),
                                 Arguments.of("kubernetes://service-name:8080/",
                                                 new ResolverTarget(null, "service-name", "8080")),
                                 Arguments.of("kubernetes://service-name.namespace:8080/",
