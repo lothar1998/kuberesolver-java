@@ -31,7 +31,6 @@ import io.grpc.Status;
  * <p>
  * This resolver watches for changes in Kubernetes EndpointSlices and updates
  * the gRPC client with the resolved addresses.
- * </p>
  * <p>
  * The target URI for this resolver is parsed by {@link ResolverTarget}, which
  * supports the following formats:
@@ -50,21 +49,18 @@ import io.grpc.Status;
  *   <li>{@code kubernetes://service-name.namespace.svc.cluster_name}</li>
  *   <li>{@code kubernetes://service-name.namespace.svc.cluster_name:8080}</li>
  * </ul>
- * </p>
  * <p>
  * If the namespace is not provided in the URI, the resolver will attempt to read
  * the current pod's namespace from the mounted file at
  * {@code /var/run/secrets/kubernetes.io/serviceaccount/namespace}. If this file
  * is not found or cannot be read, the resolver will default to using the
  * {@code default} namespace.
- * </p>
  * <p>
  * If the port is not provided in the URI, the resolver will use any of the ports
  * found in the EndpointSlice. If a port name is provided (e.g.,
  * {@code kubernetes:///myservice:grpc}), the resolver will look for a port with
  * that name in the EndpointSlice. If a numerical port is provided, that port
  * will be used directly.
- * </p>
  */
 public final class KubernetesNameResolver extends NameResolver {
 

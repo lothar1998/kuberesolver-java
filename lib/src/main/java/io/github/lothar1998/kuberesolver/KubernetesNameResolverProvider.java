@@ -27,7 +27,6 @@ import io.grpc.NameResolverProvider;
  *   <li>{@code kubernetes://service-name.namespace.svc.cluster_name}</li>
  *   <li>{@code kubernetes://service-name.namespace.svc.cluster_name:8080}</li>
  * </ul>
- * </p>
  * <p>
  * If the namespace is not explicitly provided in the URI, the underlying
  * {@link KubernetesNameResolver} will first attempt to read the current pod's
@@ -35,14 +34,12 @@ import io.grpc.NameResolverProvider;
  * {@code /var/run/secrets/kubernetes.io/serviceaccount/namespace}. If this file
  * is not found or cannot be read, it will default to using the {@code default}
  * namespace.
- * </p>
  * <p>
  * If the port is not specified in the URI, the resolver will use any of the ports
  * defined in the Kubernetes EndpointSlice. Alternatively, a port can be specified
  * by its name in the URI (e.g., {@code kubernetes:///myservice:grpc}), in which
  * case the resolver will look for an EndpointSlice port with that name. If a
  * numerical port is provided, that port will be used.
- * </p>
  */
 public class KubernetesNameResolverProvider extends NameResolverProvider {
 
