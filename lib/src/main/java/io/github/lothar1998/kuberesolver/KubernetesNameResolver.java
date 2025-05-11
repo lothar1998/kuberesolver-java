@@ -32,6 +32,39 @@ import io.grpc.Status;
  * This resolver watches for changes in Kubernetes EndpointSlices and updates
  * the gRPC client with the resolved addresses.
  * </p>
+ * <p>
+ * The target URI for this resolver is parsed by {@link ResolverTarget}, which
+ * supports the following formats:
+ * <ul>
+ *   <li>{@code kubernetes:///service-name}</li>
+ *   <li>{@code kubernetes:///service-name:8080} (with port number)</li>
+ *   <li>{@code kubernetes:///service-name:portname} (with port name)</li>
+ *   <li>{@code kubernetes:///service-name.namespace:8080} (with namespace and port number)</li>
+ *   <li>{@code kubernetes:///service-name.namespace.svc.cluster_name} (with namespace)</li>
+ *   <li>{@code kubernetes:///service-name.namespace.svc.cluster_name:8080} (with namespace and port number)</li>
+ *
+ *   <li>{@code kubernetes://namespace/service-name:8080}</li>
+ *   <li>{@code kubernetes://service-name}</li>
+ *   <li>{@code kubernetes://service-name:8080/}</li>
+ *   <li>{@code kubernetes://service-name.namespace:8080/}</li>
+ *   <li>{@code kubernetes://service-name.namespace.svc.cluster_name}</li>
+ *   <li>{@code kubernetes://service-name.namespace.svc.cluster_name:8080}</li>
+ * </ul>
+ * </p>
+ * <p>
+ * If the namespace is not provided in the URI, the resolver will attempt to read
+ * the current pod's namespace from the mounted file at
+ * {@code /var/run/secrets/kubernetes.io/serviceaccount/namespace}. If this file
+ * is not found or cannot be read, the resolver will default to using the
+ * {@code default} namespace.
+ * </p>
+ * <p>
+ * If the port is not provided in the URI, the resolver will use any of the ports
+ * found in the EndpointSlice. If a port name is provided (e.g.,
+ * {@code kubernetes:///myservice:grpc}), the resolver will look for a port with
+ * that name in the EndpointSlice. If a numerical port is provided, that port
+ * will be used directly.
+ * </p>
  */
 public final class KubernetesNameResolver extends NameResolver {
 
@@ -195,7 +228,8 @@ public final class KubernetesNameResolver extends NameResolver {
 
     /**
      * Finds the port to use for the service from the list of ports in the
-     * EndpointSlice.
+     * EndpointSlice. If the port is not provided in {@link ResolverTarget}
+     * then first port found in EndpointSlice is used.
      *
      * @param ports the list of ports in the EndpointSlice
      * @return an optional port number
