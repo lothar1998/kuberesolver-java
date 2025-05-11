@@ -100,8 +100,20 @@ public sealed class SecureEndpointSliceWatcher extends EndpointSliceWatcher perm
      * Provider interface for authentication configuration including CA certificate and token stream.
      */
     public interface AuthConfigProvider {
+        /**
+         * Provides an input stream to the CA certificate used for establishing SSL connections.
+         *
+         * @return an InputStream for the CA certificate
+         * @throws Exception if the certificate cannot be retrieved
+         */
         InputStream getCaCert() throws Exception;
 
+        /**
+         * Provides an input stream to the bearer token used for Kubernetes API authentication.
+         *
+         * @return an InputStream for the bearer token
+         * @throws Exception if the token cannot be retrieved
+         */
         InputStream getToken() throws Exception;
     }
 }
