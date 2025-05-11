@@ -22,20 +22,12 @@ java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(17)
     }
+    withSourcesJar()
+    withJavadocJar()
 }
 
 tasks.named('test') {
     useJUnitPlatform()
-}
-
-tasks.register('sourcesJar', Jar) {
-    archiveClassifier.set('sources')
-    from sourceSets.main.allJava
-}
-
-tasks.register('javadocJar', Jar) {
-    archiveClassifier.set('javadoc')
-    from tasks.javadoc
 }
 
 publishing {
@@ -46,12 +38,10 @@ publishing {
             version = System.getenv("RELEASE_VERSION") ?: "0.0.1-SNAPSHOT"
 
             from components.java
-            artifact tasks.named('javadocJar').get()
-            artifact tasks.named('sourcesJar').get()
 
             pom {
                 name = 'Kuberesolver'
-                description = 'Kuberesolver library for Java'
+                description = 'gRPC name resolver for Kubernetes'
             }
         }
     }
