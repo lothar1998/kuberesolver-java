@@ -16,7 +16,7 @@ only the JSON parsing library as the dependency to do not blow your dependency t
 ```gradle
 implementation 'io.github.lothar1998:kuberesolver-java:0.0.1'
 ```
-
+---
 ```java
 import io.github.lothar1998.kuberesolver.KubernetesNameResolverProvider;
 import io.grpc.ManagedChannelBuilder;
