@@ -16,7 +16,7 @@ only the JSON parsing library as the dependency to do not blow your dependency t
 ```groovy
 implementation 'io.github.lothar1998:kuberesolver-java:0.0.1'
 ```
----
+Then register `KubernetesNameResolverProvider` in default registry:
 ```java
 import io.github.lothar1998.kuberesolver.KubernetesNameResolverProvider;
 import io.grpc.ManagedChannelBuilder;
