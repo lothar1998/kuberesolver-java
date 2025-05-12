@@ -4,7 +4,7 @@ only the JSON parsing library as the dependency to do not blow your dependency t
 
 ### Usage
 #### Maven
-```maven
+```xml
 <dependency>
     <groupId>io.github.lothar1998</groupId>
     <artifactId>kuberesolver-java</artifactId>
@@ -13,7 +13,7 @@ only the JSON parsing library as the dependency to do not blow your dependency t
 ```
 
 #### Gradle
-```gradle
+```groovy
 implementation 'io.github.lothar1998:kuberesolver-java:0.0.1'
 ```
 ---
