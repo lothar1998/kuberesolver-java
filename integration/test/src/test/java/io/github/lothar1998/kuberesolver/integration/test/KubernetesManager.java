@@ -66,11 +66,10 @@ public class KubernetesManager {
                                 .list()
                                 .getItems()
                                 .stream()
-                                .findAny()
                                 .map(EndpointSlice::getEndpoints)
-                                .stream()
+                                .filter(Objects::nonNull)
                                 .flatMap(Collection::stream)
-                                .filter(e -> e.getConditions().getReady())
+                                .filter(e -> e != null && e.getConditions() != null && e.getConditions().getReady())
                                 .toList(),
                         readyEndpoints -> (long) readyEndpoints.size() == replicasCount
                 );
