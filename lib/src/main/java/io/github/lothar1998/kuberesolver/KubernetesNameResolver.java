@@ -120,7 +120,7 @@ public final class KubernetesNameResolver extends NameResolver {
     @Override
     public void start(Listener listener) {
         this.listener = listener;
-        resolve();
+        refresh();
     }
 
     /**
