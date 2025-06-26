@@ -51,7 +51,7 @@ public class KuberesolverTest {
     @DisplayName("should continuously resolve all addresses of deployment behind a service")
     @ParameterizedTest(name = "replicas changes = {0}")
     @MethodSource(value = "testCases")
-    void continuouslyResolveAllAddressesTest(List<Integer> replicasHistory) throws IOException, InterruptedException {
+    void continuouslyResolveAllAddressesTest(List<Integer> replicasHistory) {
         for (Integer replicas : replicasHistory) {
             log.info("Scaling server to {} replicas", replicas);
             final var serverIPs = manager.scaleServer(replicas);

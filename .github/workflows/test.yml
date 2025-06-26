@@ -38,6 +38,8 @@ jobs:
           distribution: 'temurin'
       - name: Setup Minikube
         uses: medyagh/setup-minikube@latest
+        with:
+          extra-config: 'controller-manager.max-endpoints-per-slice=2'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
       - name: Run Integration Tests
